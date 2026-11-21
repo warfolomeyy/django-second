@@ -1,3 +1,15 @@
 from django.urls import path
+from . import views
 
-urlpatterns = []
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('profile/', views.profile, name='profile'),
+    path('application/create/', views.create_application, name='create_app'),
+    path('application/<int:pk>/delete/', views.delete_application, name='delete_app'),
+    path('panel/', views.admin_dashboard, name='admin_dashboard'),
+    path('panel/category/<int:pk>/delete/', views.delete_category, name='delete_category'),
+    path('panel/application/<int:pk>/status/', views.change_status, name='change_status'),
+]
