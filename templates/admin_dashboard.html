@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Панель администратора</h1>
+
+<h2>Управление категориями</h2>
+<form method="post" style="margin-bottom: 10px;">
+    {% csrf_token %}
+    {{ cat_form.name }}
+    <button type="submit">Добавить категорию</button>
+    {{ cat_form.errors }}
+</form>
+
+<ul>
+    {% for cat in categories %}
+    <li>
+        {{ cat.name }}
+        <form method="post" action="{% url 'delete_category' cat.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Удалить</button>
+        </form>
+    </li>
+    {% empty %}
+    <li>Категорий пока нет.</li>
+    {% endfor %}
+</ul>
+
+<h2>Все заявки пользователей</h2>
+<table>
+    <tr>
+        <th>Дата</th>
+        <th>Пользователь</th>
+        <th>Название</th>
+        <th>Категория</th>
+        <th>План</th>
+        <th>Статус</th>
+        <th>Управление</th>
+    </tr>
+    {% for app in apps %}
+    <tr>
+        <td>{{ app.created_at|date:"d.m.Y H:i" }}</td>
+        <td>{{ app.user.username }}</td>
+        <td>{{ app.title }}</td>
+        <td>{{ app.category.name }}</td>
+        <td><a href="{{ app.photo.url }}" target="_blank">Открыть</a></td>
+        <td>{{ app.get_status_display }}</td>
+        <td>
+            {% if app.status == 'new' %}
+            <a href="{% url 'change_status' app.pk %}">Сменить статус</a>
+            {% else %}
+            Статус изменён
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">Заявок нет.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

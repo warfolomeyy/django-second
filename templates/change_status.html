@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Смена статуса заявки «{{ app.title }}»</h1>
+<p>Описание: {{ app.description }}</p>
+<p><a href="{{ app.photo.url }}" target="_blank">Посмотреть план помещения</a></p>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="{% if field.errors %}field-error{% endif %}" style="margin-bottom: 12px;">
+        <label>{{ field.label }}:</label><br>
+        {{ field }}
+        {{ field.errors }}
+    </div>
+    {% endfor %}
+    <button type="submit">Сохранить</button>
+    <a href="{% url 'admin_dashboard' %}" style="margin-left: 10px;">Назад</a>
+</form>
+{% endblock %}

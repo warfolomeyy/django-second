@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Личный кабинет</h1>
+<p><a href="{% url 'create_app' %}">+ Создать новую заявку</a></p>
+
+<form method="get" style="margin-bottom: 15px;">
+    <label>Фильтр по статусу:</label>
+    <select name="status">
+        <option value="" {% if status_filter == '' %}selected{% endif %}>Все</option>
+        <option value="new" {% if status_filter == 'new' %}selected{% endif %}>Новая</option>
+        <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>Принято в работу</option>
+        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Выполнено</option>
+    </select>
+    <button type="submit">Применить</button>
+</form>
+
+{% if apps %}
+<table>
+    <tr>
+        <th>Дата создания</th>
+        <th>Название</th>
+        <th>Описание</th>
+        <th>Категория</th>
+        <th>Статус</th>
+        <th>Действия</th>
+    </tr>
+    {% for app in apps %}
+    <tr>
+        <td>{{ app.created_at|date:"d.m.Y H:i" }}</td>
+        <td>{{ app.title }}</td>
+        <td>{{ app.description }}</td>
+        <td>{{ app.category.name }}</td>
+        <td>
+            {{ app.get_status_display }}
+            {% if app.status == 'in_progress' and app.admin_comment %}
+            <br><small>Комментарий: {{ app.admin_comment }}</small>
+            {% endif %}
+            {% if app.status == 'completed' and app.design_image %}
+            <br><a href="{{ app.design_image.url }}" target="_blank">Посмотреть дизайн</a>
+            {% endif %}
+        </td>
+        <td>
+            {% if app.status == 'new' %}
+            <a href="{% url 'delete_app' app.pk %}">Удалить</a>
+            {% else %}
+            —
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Заявок нет.</p>
+{% endif %}
+{% endblock %}

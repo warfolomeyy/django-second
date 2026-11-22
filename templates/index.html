@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Дизайн-студия «Design.pro»</h1>
+<p>Заявок в работе сейчас: <b>{{ in_progress_count }}</b></p>
+
+<h2>Последние выполненные проекты</h2>
+{% if completed_apps %}
+<table>
+    <tr>
+        <th>Дата создания</th>
+        <th>Название</th>
+        <th>Категория</th>
+        <th>Дизайн</th>
+    </tr>
+    {% for app in completed_apps %}
+    <tr>
+        <td>{{ app.created_at|date:"d.m.Y H:i" }}</td>
+        <td>{{ app.title }}</td>
+        <td>{{ app.category.name }}</td>
+        <td>
+            {% if app.design_image %}
+            <img src="{{ app.design_image.url }}" alt="{{ app.title }}" width="150">
+            {% elif app.photo %}
+            <img src="{{ app.photo.url }}" alt="{{ app.title }}" width="150">
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Выполненных заявок пока нет.</p>
+{% endif %}
+{% endblock %}
