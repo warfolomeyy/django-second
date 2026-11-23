@@ -4,26 +4,36 @@
 <h1>Панель администратора</h1>
 
 <h2>Управление категориями</h2>
-<form method="post" style="margin-bottom: 10px;">
+<form method="post" style="margin-bottom: 12px; display: flex; gap: 8px; align-items: flex-start;">
     {% csrf_token %}
-    {{ cat_form.name }}
+    <div>
+        {{ cat_form.name }}
+        {{ cat_form.errors }}
+    </div>
     <button type="submit">Добавить категорию</button>
-    {{ cat_form.errors }}
 </form>
 
-<ul>
+<table>
+    <tr>
+        <th>Название категории</th>
+        <th>Количество заявок</th>
+        <th>Действие</th>
+    </tr>
     {% for cat in categories %}
-    <li>
-        {{ cat.name }}
-        <form method="post" action="{% url 'delete_category' cat.pk %}" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit">Удалить</button>
-        </form>
-    </li>
+    <tr>
+        <td>{{ cat.name }}</td>
+        <td>{{ cat.application_set.count }}</td>
+        <td>
+            <form method="post" action="{% url 'delete_category' cat.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Удалить</button>
+            </form>
+        </td>
+    </tr>
     {% empty %}
-    <li>Категорий пока нет.</li>
+    <tr><td colspan="3">Категорий пока нет.</td></tr>
     {% endfor %}
-</ul>
+</table>
 
 <h2>Все заявки пользователей</h2>
 <table>
@@ -34,21 +44,23 @@
         <th>Категория</th>
         <th>План</th>
         <th>Статус</th>
-        <th>Управление</th>
+        <th>Детали / Управление</th>
     </tr>
     {% for app in apps %}
     <tr>
         <td>{{ app.created_at|date:"d.m.Y H:i" }}</td>
-        <td>{{ app.user.username }}</td>
-        <td>{{ app.title }}</td>
+        <td>{{ app.user.full_name }} ({{ app.user.username }})</td>
+        <td><b>{{ app.title }}</b><br><small>{{ app.description }}</small></td>
         <td>{{ app.category.name }}</td>
         <td><a href="{{ app.photo.url }}" target="_blank">Открыть</a></td>
         <td>{{ app.get_status_display }}</td>
         <td>
             {% if app.status == 'new' %}
             <a href="{% url 'change_status' app.pk %}">Сменить статус</a>
-            {% else %}
-            Статус изменён
+            {% elif app.status == 'in_progress' %}
+            <small>Комментарий: {{ app.admin_comment }}</small>
+            {% elif app.status == 'completed' and app.design_image %}
+            <a href="{{ app.design_image.url }}" target="_blank">Готовый дизайн</a>
             {% endif %}
         </td>
     </tr>
