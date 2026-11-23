@@ -28,7 +28,15 @@ class RegisterForm(forms.ModelForm):
         username = self.cleaned_data.get('username', '').strip()
         if not re.match(r'^[A-Za-z-]+$', username):
             raise ValidationError('Логин должен содержать только латиницу и дефис.')
+        if CustomUser.objects.filter(username__iexact=username).exists():
+            raise ValidationError('Пользователь с таким логином уже зарегистрирован.')
         return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip()
+        if CustomUser.objects.filter(email__iexact=email).exists():
+            raise ValidationError('Этот Email уже используется.')
+        return email
 
     def clean_consent(self):
         consent = self.cleaned_data.get('consent')
@@ -65,6 +73,12 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name']
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name', '').strip()
+        if Category.objects.filter(name__iexact=name).exists():
+            raise ValidationError('Категория с таким названием уже существует.')
+        return name
 
 
 class StatusChangeForm(forms.ModelForm):
